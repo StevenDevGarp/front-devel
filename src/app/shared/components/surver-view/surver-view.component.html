@@ -1,0 +1,67 @@
+<div *ngIf="loading" class="flex justify-center items-center h-screen">
+    <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+  </div>
+
+  <div *ngIf="!loading && !survey" class="flex justify-center items-center h-screen">
+    <div class="text-2xl font-semibold text-gray-700">Survey not found</div>
+  </div>
+
+  <div *ngIf="!loading && survey" class="container mx-auto p-4 md:p-8">
+    <div class="card w-full max-w-4xl mx-auto">
+      <div class="card-header bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-t-lg">
+        <h1 class="card-title text-3xl font-bold">{{ survey.name }}</h1>
+        <p class="card-description text-gray-100 mt-2">{{ survey.description }}</p>
+      </div>
+      <div class="card-content p-6">
+        <form class="space-y-8">
+          <div *ngFor="let field of survey.fields; let index = index" class="space-y-2">
+            <label [for]="field.name" class="text-lg font-medium text-gray-700">
+              {{ field.name }}
+              <span *ngIf="field.required" class="text-red-500 ml-1">*</span>
+            </label>
+            <div [ngSwitch]="field.type">
+              <textarea *ngSwitchCase="'Text'"
+                [id]="field.name"
+                placeholder="Enter {{ field.name.toLowerCase() }}"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </textarea>
+              <input *ngSwitchCase="'Number'"
+                type="number"
+                [id]="field.name"
+                placeholder="Enter {{ field.name.toLowerCase() }}"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+              <input *ngSwitchCase="'Date'"
+                type="date"
+                [id]="field.name"
+                placeholder="Enter {{ field.name.toLowerCase() }}"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+              <div *ngSwitchCase="'SingleChoice'" class="space-y-2">
+                <div *ngFor="let option of field.options; let optionIndex = index" class="flex items-center space-x-2">
+                  <input type="radio"
+                    [name]="field.name"
+                    [id]="field.name + '-' + optionIndex"
+                    [value]="option"
+                    class="text-purple-600 focus:ring-purple-500" />
+                  <label [for]="field.name + '-' + optionIndex" class="text-gray-700">{{ option }}</label>
+                </div>
+              </div>
+              <div *ngSwitchCase="'MultipleChoice'" class="space-y-2">
+                <div *ngFor="let option of field.options; let optionIndex = index" class="flex items-center space-x-2">
+                  <input type="checkbox"
+                    [id]="field.name + '-' + optionIndex"
+                    [value]="option"
+                    class="text-purple-600 focus:ring-purple-500 rounded" />
+                  <label [for]="field.name + '-' + optionIndex" class="text-gray-700">{{ option }}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="mt-8 p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+          <p>Created by: <span class="font-semibold">{{ survey.createdBy }}</span></p>
+          <p>Created at: <span class="font-semibold">{{ survey.createdAt | date: 'medium' }}</span></p>
+          <p>Last updated: <span class="font-semibold">{{ survey.updatedAt | date: 'medium' }}</span></p>
+        </div>
+      </div>
+    </div>
+  </div>

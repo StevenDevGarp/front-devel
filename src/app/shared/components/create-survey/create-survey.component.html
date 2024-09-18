@@ -1,0 +1,74 @@
+<div class="min-h-screen flex items-center justify-center p-4">
+    <form [formGroup]="surveyForm" (ngSubmit)="handleSubmit()" class="space-y-8 max-w-2xl w-full bg-white rounded-3xl shadow-lg p-8">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold mb-2">Create New Survey</h1>
+        <p>Design your survey with custom fields and options</p>
+      </div>
+  
+      <div class="space-y-4">
+        <div>
+          <label for="name" class="text-lg font-medium">Survey Name</label>
+          <input
+            id="name"
+            formControlName="name"
+            required
+            class="mt-1 block w-full rounded-md border-gray-300"
+            placeholder="Enter survey name"
+          />
+        </div>
+  
+        <div>
+          <label for="description" class="text-lg font-medium">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            class="mt-1 block w-full rounded-md border-gray-300"
+            placeholder="Enter survey description"
+          ></textarea>
+        </div>
+      </div>
+  
+      <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Survey Fields</h2>
+        <div formArrayName="fields">
+          <div
+            *ngFor="let field of fields.controls; let i = index"
+            [formGroupName]="i"
+            class="p-4 bg-gray-100 rounded-lg space-y-4"
+          >
+            <div class="flex items-center justify-between">
+              <input
+                placeholder="Field Name"
+                formControlName="name"
+                class="flex-grow mr-2 border-gray-300 rounded-md"
+              />
+              <button type="button" (click)="removeField(i)" class="text-red-500 hover:text-red-700">
+                &#x1F5D1;
+              </button>
+            </div>
+  
+            <select formControlName="type" class="w-full border-gray-300 rounded-md">
+              <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
+            </select>
+  
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" formControlName="required" id="required-{{ i }}" />
+              <label for="required-{{ i }}" class="text-sm">Required</label>
+            </div>
+          </div>
+        </div>
+  
+        <button type="button" (click)="addField()" class="w-full border border-gray-300 rounded-md p-2">
+          &#x2795; Add Field
+        </button>
+      </div>
+  
+      <button
+        type="submit"
+        [disabled]="isSubmitting"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-full"
+      >
+        {{ isSubmitting ? 'Creating Survey...' : 'Create Survey' }}
+      </button>
+    </form>
+  </div>
