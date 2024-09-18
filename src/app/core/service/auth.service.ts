@@ -9,18 +9,20 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
 
-  private authUrl = 'http://127.0.0.1:8080/auth/login';
+  private authUrl = 'http://localhost:3000/auth/login';
   private tokenKey = 'authToken';
 
   constructor(private http: HttpClient, private router: Router) { }
 
   login(username: string, password: string): Observable<any> {
+    console.log(username, password);
     return this.http.post<any>(this.authUrl, { username, password })
       .pipe(
         tap(response => {
-          if (response && response.token) {
-            console.log(response.token);
-            this.setToken(response.token);
+          console.log(response.accessToken);
+          if (response && response.accessToken) {
+            console.log(response);
+            this.setToken(response.accessToken);
           }
         })
       );

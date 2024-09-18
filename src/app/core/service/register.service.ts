@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class RegisterService {
-  private authUrl = 'http://127.0.0.1:8080/auth/register';
+  private authUrl = 'http://127.0.0.1:000/auth/register';
   private tokenKey = 'authToken';
 
   constructor(private http: HttpClient, private router: Router) { }

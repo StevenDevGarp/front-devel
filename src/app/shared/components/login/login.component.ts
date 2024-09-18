@@ -20,7 +20,7 @@ export class LoginComponent {
 
   login(): void {
     this.authService.login(this.user, this.password).subscribe({
-      next: () => this.router.navigate(['/news-list']),
+      next: () => this.router.navigate(['/survey-list']),
       error: () => alert('Usuario o contraseña incorrectos')
     })
   }

@@ -1,60 +1,63 @@
 <div class="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 p-8">
-    <div class="max-w-7xl mx-auto">
-      <!-- Encabezado -->
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-4xl font-bold text-white">Your Surveys</h1>
-        <button class="bg-white text-purple-600 hover:bg-purple-100 flex items-center px-4 py-2 rounded">
+  <div class="max-w-7xl mx-auto">
+    <!-- Encabezado -->
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-4xl font-bold text-white">Your Surveys</h1>
+      <button
+        class="bg-white text-purple-600 hover:bg-purple-100 flex items-center px-4 py-2 rounded"
+        (click)="createNewSurvey()"
+      >
+        Create New Survey
+      </button>
+    </div>
 
-          Create New Survey
-        </button>
-      </div>
+    <!-- Mostrar indicador de carga -->
+    <div *ngIf="surveys.length === 0" class="text-white">Loading surveys...</div>
 
-      <!-- Grid de tarjetas -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          *ngFor="let survey of surveys"
-          class="bg-white bg-opacity-90 backdrop-blur-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded"
-        >
-
-          <!-- Contenido de la tarjeta -->
-          <div class="p-4">
-            <!-- Encabezado de la tarjeta -->
-            <div class="flex justify-between items-start">
-              <h2 class="text-xl font-bold text-gray-800">{{ survey.name }}</h2>
-              <span
-                [ngClass]="{
-                  'bg-green-100 text-green-800': survey.status === 'active',
-                  'bg-yellow-100 text-yellow-800': survey.status === 'draft',
-                  'bg-red-100 text-red-800': survey.status === 'closed'
-                }"
-                class="px-2 py-1 rounded text-sm font-medium"
-              >
-                {{ survey.status }}
-              </span>
-            </div>
-
-            <!-- Descripción de la tarjeta -->
-            <p class="text-gray-600">{{ survey.description }}</p>
-          </div>
-          <!-- Contenido adicional -->
-          <div class="p-4">
-            <div class="flex items-center text-sm text-gray-500 mb-2">
-
-              Created on {{ survey.createdAt }}
-            </div>
-            <div class="flex items-center text-sm text-gray-500">
-
-              {{ survey.responses }} responses
-            </div>
+    <!-- Grid de tarjetas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        *ngFor="let survey of surveys"
+        class="bg-white bg-opacity-90 backdrop-blur-lg shadow-lg hover:shadow-xl transition-shadow duration-300 rounded"
+      >
+        <!-- Contenido de la tarjeta -->
+        <div class="p-4">
+          <!-- Encabezado de la tarjeta -->
+          <div class="flex justify-between items-start">
+            <h2 class="text-xl font-bold text-gray-800">{{ survey.name }}</h2>
           </div>
 
-          <!-- Pie de la tarjeta -->
-          <div class="p-4">
-            <button class="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center px-4 py-2 rounded">
-              View Results
-            </button>
+          <!-- Descripción de la tarjeta -->
+          <p class="text-gray-600">{{ survey.description }}</p>
+        </div>
+
+        <!-- Mostrar campos de la encuesta -->
+        <div class="p-4">
+          <div class="flex items-center text-sm text-gray-500 mb-2">
+
+            Created on {{ survey.createdAt }}
+          </div>
+          <div class="flex items-center text-sm text-gray-500">
+
+            {{ survey.fields.length }} responses
           </div>
         </div>
+
+        <!-- Pie de la tarjeta -->
+        <div class="p-4">
+          <button
+            class="w-full bg-yellow-500 hover:bg-yellow-600 text-white flex items-center justify-center px-4 py-2 rounded mb-2"
+            (click)="editSurvey(survey.id)"
+          >
+            Edit Survey
+          </button>
+          <button
+            class="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center px-4 py-2 rounded"
+            (click)="viewResults(survey.id)"
+          >
+            View Results
+          </button>
       </div>
     </div>
   </div>
+</div>

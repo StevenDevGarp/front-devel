@@ -1,44 +1,24 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ApiServiceService } from '@service/api-service.service';  // Importar el servicio real
+import { Survey } from '../../models/survey.model';  
+import { ReactiveFormsModule } from '@angular/forms'
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-
-// Mock function to simulate API call
-const createSurvey = async (survey: Survey): Promise<{ success: boolean; message: string; id: string }> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  const mockId = Math.random().toString(36).substr(2, 9);
-  return { success: true, message: 'Survey created successfully!', id: mockId };
-};
-
-type FieldType = 'Number' | 'Text' | 'Date' | 'MultipleChoice' | 'SingleChoice';
-
-interface SurveyField {
-  name: string;
-  type: FieldType;
-  required: boolean;
-  options?: string[]; // For MultipleChoice and SingleChoice
-}
-interface Survey {
-  id?: string;
-  name: string;
-  description: string;
-  fields: SurveyField[];
-}
 
 @Component({
   selector: 'app-create-survey',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './create-survey.component.html',
   styleUrl: './create-survey.component.css'
 })
 export class CreateSurveyComponent {
   surveyForm: FormGroup;
   isSubmitting = false;
-  fieldTypes: FieldType[] = ['Number', 'Text', 'Date', 'MultipleChoice', 'SingleChoice'];
+  fieldTypes: string[] = ['Number', 'Text', 'Date', 'MultipleChoice', 'SingleChoice'];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private surveyService: ApiServiceService) {
     this.surveyForm = this.fb.group({
       name: ['', Validators.required],
       description: [''],
@@ -46,10 +26,12 @@ export class CreateSurveyComponent {
     });
   }
 
+  // Getter para obtener el array de campos
   get fields(): FormArray {
     return this.surveyForm.get('fields') as FormArray;
   }
 
+  // Función para agregar un nuevo campo al formulario
   addField(): void {
     const fieldGroup = this.fb.group({
       name: ['', Validators.required],
@@ -60,10 +42,12 @@ export class CreateSurveyComponent {
     this.fields.push(fieldGroup);
   }
 
+  // Función para eliminar un campo específico
   removeField(index: number): void {
     this.fields.removeAt(index);
   }
 
+  // Función de validación para el formulario
   validateSurvey(): boolean {
     if (this.surveyForm.invalid) {
       alert('Please fill in all required fields.');
@@ -76,25 +60,30 @@ export class CreateSurveyComponent {
     return true;
   }
 
-  async handleSubmit(): Promise<void> {
+  // Función para manejar el envío del formulario
+  handleSubmit(): void {
     if (!this.validateSurvey()) {
       return;
     }
 
     this.isSubmitting = true;
-    try {
-      const survey: Survey = this.surveyForm.value;
-      const result = await createSurvey(survey);
-      if (result.success) {
-        alert(result.message);
-        this.router.navigate([`/surveys/${result.id}`]);
-      } else {
+    const survey: Survey = this.surveyForm.value;
+
+    // Llamada al servicio para crear la encuesta
+    this.surveyService.createSurvey(survey).subscribe(
+      (response) => {
+        // Manejar la respuesta exitosa
+        alert('Survey created successfully!');
+        this.router.navigate([`/surveys/${response.id}`]);  // Redirigir a la vista de la encuesta recién creada
+      },
+      (error) => {
+        // Manejar errores
+        console.error('Error creating survey:', error);
         alert('Failed to create survey.');
+      },
+      () => {
+        this.isSubmitting = false;
       }
-    } catch (error) {
-      alert('An unexpected error occurred.');
-    } finally {
-      this.isSubmitting = false;
-    }
+    );
   }
 }

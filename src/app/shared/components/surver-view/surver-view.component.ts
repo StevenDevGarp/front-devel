@@ -2,25 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiServiceService } from '@service/api-service.service'; // Asegúrate de que la ruta sea correcta
+import { Survey } from '../../models/survey.model'; // Asegúrate de que la ruta sea correcta
 
-type FieldType = "Number" | "Text" | "Date" | "MultipleChoice" | "SingleChoice";
 
-interface SurveyField {
-  name: string;
-  type: FieldType;
-  required: boolean;
-  options?: string[];
-}
-
-interface Survey {
-  id: string;
-  name: string;
-  description: string;
-  fields: SurveyField[];
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 @Component({
   selector: 'app-surver-view',
@@ -35,8 +20,9 @@ interface Survey {
 export class SurverViewComponent implements OnInit {
   survey: Survey | null = null;
   loading = true;
+  formValues: any = {}; // Objeto para almacenar los valores del formulario
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private apiService: ApiServiceService) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -45,46 +31,33 @@ export class SurverViewComponent implements OnInit {
     }
   }
 
-  async loadSurvey(id: string) {
-    try {
-      this.survey = await this.fetchSurvey(id);
-    } catch (error) {
-      console.error('Failed to fetch survey:', error);
-    } finally {
-      this.loading = false;
-    }
+  // Método para cargar la encuesta usando el servicio
+  loadSurvey(id: string) {
+    this.apiService.getSurvey(id).subscribe({
+      next: (survey: Survey) => {
+        this.survey = survey;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Failed to fetch survey:', error);
+        this.loading = false;
+      }
+    });
   }
 
-  async fetchSurvey(id: string): Promise<Survey> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Mock survey data
-    return {
-      id,
-      name: 'Customer Satisfaction Survey',
-      description: 'Help us improve our services by providing your feedback',
-      fields: [
-        { name: 'Name', type: 'Text', required: true },
-        { name: 'Age', type: 'Number', required: true },
-        { name: 'Feedback', type: 'Text', required: false },
-        { name: 'Visit Date', type: 'Date', required: true },
-        {
-          name: 'Overall Experience',
-          type: 'SingleChoice',
-          required: true,
-          options: ['Excellent', 'Good', 'Average', 'Poor'],
+  // Método para manejar el envío de la encuesta
+  submitSurvey() {
+    if (this.survey) {
+      const surveyId = this.survey.id;
+      this.apiService.answerSurvey(String(surveyId), this.formValues).subscribe({
+        next: (response) => {
+          console.log('Survey submitted successfully:', response);
+          // Podrías agregar aquí un mensaje de éxito o redirigir al usuario
         },
-        {
-          name: 'Areas of Improvement',
-          type: 'MultipleChoice',
-          required: false,
-          options: ['Service', 'Product Quality', 'Cleanliness', 'Price'],
-        },
-      ],
-      createdBy: 'John Doe',
-      createdAt: '2023-06-01T12:00:00Z',
-      updatedAt: '2023-06-01T12:00:00Z',
-    };
+        error: (error) => {
+          console.error('Error submitting survey:', error);
+        }
+      });
+    }
   }
 }
